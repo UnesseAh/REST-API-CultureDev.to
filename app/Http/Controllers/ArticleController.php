@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
-
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateArticleRequest;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Resources\ArticleResource;
+use App\Http\Resources\ArticleCollection;
+use App\Models\Article;
+
+
 
 class ArticleController extends Controller
 {
@@ -20,11 +22,14 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = ArticleResource::collection(Article::get());
-        // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
-        return $this->apiResponse($articles, 'ok', 200);
-       
+        // $articles = ArticleResource::collection(Article::get());
+        // // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
+        // return $this->apiResponse($articles, 'ok', 200);
 
+       // toufik work
+        $articles = Article::all();
+
+        return new ArticleCollection($articles);
 
     }
 
@@ -75,13 +80,20 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Article $article)
     {
-        $article = Article::findorfail($id);
-        if ($article) {
-            return $this->apiResponse($article, 'ok', 200);
+        // $article = Article::findorfail($id);
+        // if ($article) {
+        //     return $this->apiResponse($article, 'ok', 200);
+        // }
+        // return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+
+
+        // // toufik work
+        if (!$article) {
+            return response()->json(['message' => 'Article not found'], 404);
         }
-        return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+        return new ArticleResource($article);
     }
 
     /**
@@ -116,7 +128,7 @@ class ArticleController extends Controller
         if ($validator->fails()) {
             return $this->apiResponse(null, $validator->errors(),  400);
         }
-        
+
         $article = Article::findorfail($id);
 
         if(!$article){
@@ -126,7 +138,7 @@ class ArticleController extends Controller
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
-        
+
     }
 
     /**
