@@ -17,16 +17,24 @@ class ArticleResource extends JsonResource
     {
         // return parent::toArray($request);
         return [
-           
-            'title'=>$this->title,
-            'description'=>$this->description,
+
+            // 'title'=>$this->title,
+            // 'description'=>$this->description,
+            // 'content'=>$this->content,
+            // 'category'=>$this->categorie,
+
+            // 'category_id'=>$this->category_id,
+
+            'id' => $this->id,
+            'title' => $this->title,
             'content'=>$this->content,
-            'category'=>$this->categorie,
+            'description' => $this->description,
+            'category' => new CategoryResource($this->category),
+            'user' => new UserResource($this->user),
+            'comments' => new CommentCollection($this->comments)
 
-            'category_id'=>$this->category_id,
 
 
-            
             // 'category'=>$this->categorie->category ?? null,
             // 'tag'=>$this->tags->tag,
             // 'comment'=>$this->comments->comment,
