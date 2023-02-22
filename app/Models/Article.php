@@ -27,6 +27,7 @@ class Article extends Model
     // public function user(){
     //     return $this->hasOne(User::class);
     // }
+
     // public function comments(){
     //     return $this->hasMany(Comment::class);
     // }
