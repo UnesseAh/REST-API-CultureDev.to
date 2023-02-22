@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
 
 /*
@@ -20,7 +21,11 @@ use App\Http\Controllers\TagController;
 |
 */
 
+//users
+
 Route::get('/user', [AuthController::class,'user'])->middleware('auth:sanctum');
+
+Route::post('/user/{user}',[ProfileController::class,'editProfile']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -40,6 +45,8 @@ Route::group(['middleware'=>'auth:sanctum'], function(){
 
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
+
+
 //Articles
 Route::get('/articles',[ArticleController::class,'index']);
 Route::get('/articles/{id}',[ArticleController::class,'show']);

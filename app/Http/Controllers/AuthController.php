@@ -58,11 +58,5 @@ class AuthController extends Controller
         
     }
 
-    public function profile(){
-        return auth('sanctum')->user()->id;
-    }
 
-    public function user(){
-        return Auth::user();
-    }
 }
