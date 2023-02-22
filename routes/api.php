@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\RoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +33,10 @@ Route::post('tags', [TagController::class, 'store']);
 Route::get('tags/{tag}', [TagController::class, 'show']);
 Route::put('tags/{tag}', [TagController::class, 'update']);
 Route::delete('tags/{tag}', [TagController::class, 'destroy']);
+
+// Roles
+Route::get('roles', [RoleController::class, 'index']);
+Route::post('roles', [RoleController::class, 'store']);
+Route::get('roles/{role}', [RoleController::class, 'show']);
+Route::put('roles/{role}', [RoleController::class, 'update']);
+Route::delete('roles/{role}', [RoleController::class, 'destroy']);
