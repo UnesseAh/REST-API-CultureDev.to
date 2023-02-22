@@ -9,4 +9,8 @@ class Tag extends Model
 {
     use HasFactory;
     protected $fillable = ['tag'];
+
+    public function articles(){
+        return $this->hasMany(Article::class);
+    }
 }
