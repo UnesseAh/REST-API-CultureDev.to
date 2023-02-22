@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
@@ -38,4 +39,12 @@ Route::post('tags', [TagController::class, 'store']);
 Route::get('tag/{tag}', [TagController::class, 'show']);
 Route::put('tag/{tag}', [TagController::class, 'update']);
 Route::delete('tag/{tag}', [TagController::class, 'destroy']);
+
+
+// Roles
+Route::get('roles', [RoleController::class, 'index']);
+Route::post('roles', [RoleController::class, 'store']);
+Route::get('roles/{role}', [RoleController::class, 'show']);
+Route::put('roles/{role}', [RoleController::class, 'update']);
+Route::delete('roles/{role}', [RoleController::class, 'destroy']);
 
