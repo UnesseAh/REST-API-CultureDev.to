@@ -60,7 +60,6 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
@@ -83,9 +82,9 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show(Article $article)
+    public function show(Article $article,$id)
     {
-        // $article = Article::findorfail($id);
+        $article = Article::findorfail($id);
         // if ($article) {
         //     return $this->apiResponse($article, 'ok', 200);
         // }
@@ -94,7 +93,7 @@ class ArticleController extends Controller
 
         // // toufik work
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            // return response()->json(['message' => 'Article not found'], 404);
         }
         return new ArticleResource($article);
     }
@@ -131,7 +130,6 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
