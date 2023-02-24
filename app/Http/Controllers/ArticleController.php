@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ArticleCollection;
 use App\Models\Article;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -83,9 +84,9 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show(Article $article)
+    public function show(Article $article,$id)
     {
-        // $article = Article::findorfail($id);
+        $article = Article::findorfail($id);
         // if ($article) {
         //     return $this->apiResponse($article, 'ok', 200);
         // }
@@ -131,7 +132,7 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
+            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
@@ -139,7 +140,7 @@ class ArticleController extends Controller
             return $this->apiResponse(null, $validator->errors(), 400);
         }
 
-        $article = Article::findorfail($id);
+        // $article = Article::findorfail($id);
 
         $article->update($request->all());
         if($article){
@@ -161,7 +162,10 @@ class ArticleController extends Controller
         if (!$article) {
             return $this->apiResponse(null, 'Article not found', 404);
         }
-        $article->delete($id);
+        // Remove references to the article being deleted from the "article_tags" table
+        DB::table('article_tags')->where('article_id', $id)->delete();
+        
+        $article->delete();
         if ($article) {
             return $this->apiResponse(null, 'Article deleted', 200);
         }
