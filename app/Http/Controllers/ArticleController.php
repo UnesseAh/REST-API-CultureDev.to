@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
-
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateArticleRequest;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Resources\ArticleResource;
+use App\Http\Resources\ArticleCollection;
+use App\Models\Article;
+use Illuminate\Support\Facades\DB;
+
+
 
 class ArticleController extends Controller
 {
@@ -18,15 +21,21 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
     public function index()
     {
-        $articles = ArticleResource::collection(Article::get());
-        // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
-        return $this->apiResponse($articles, 'ok', 200);
+        // $articles = ArticleResource::collection(Article::get());
+        // // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
+        // return $this->apiResponse($articles, 'ok', 200);
 
+       // toufik work
+        $articles = Article::all();
 
+        return new ArticleCollection($articles);
 
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -46,17 +55,16 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return $this->apiResponse(null, $validator->errors(), status: 400);
+            return $this->apiResponse(null, $validator->errors(), 400);
         }
 
         $article = Article::create($request->all());
@@ -74,13 +82,16 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Article $article,$id)
     {
-        $article = Article::findorfail($id);
+        $article = Article::find($id);
         if ($article) {
-            return $this->apiResponse($article, 'ok', 200);
+             return new ArticleResource($article);
         }
         return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+
+
+
     }
 
     /**
@@ -101,32 +112,40 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
+
+
     public function update(Request $request, $id)
     {
+//        $user = Auth::user();
+//        if(!$user->can('edit every article') && $user->id != $article->user_id){
+//            return $this->apiResponse(null, 'you dont have permission to edit this article', 400);
+//        }
+         $article = Article::find($id);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
+        }
 
-         $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return $this->apiResponse(null, $validator->errors(),  400);
+            return $this->apiResponse(null, $validator->errors(), 400);
         }
 
-        $article = Article::findorfail($id);
 
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
-        }
+
         $article->update($request->all());
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
+
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -136,26 +155,42 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        $article = Article::findorfail($id);
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
+        $article = Article::find($id);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
         }
-        $article->delete($id);
-        if($article){
-            return $this->apiResponse(null,'Article deleted',200);
+
+        // Remove references to the article being deleted from the "article_tags" table
+        DB::table('article_tags')->where('article_id', $id)->delete();
+
+        $article->delete();
+        if ($article) {
+            return $this->apiResponse(null, 'Article deleted', 200);
         }
     }
 
-    public function search($search){
-        // $article=Article::with('categorie')->where('category','like','%$search%')->get();
-        $article=Article::where('title','like',"$search%")->get();
+    public function search($search)
+    {
+        // $article=Article::with('categorie')->where('category','like','$search%')->get();
+        // $article=Article::join('categories', 'categories.id', '=', 'articles.category_id')
+        //                  ->join('tags', 'tags.id', '=', 'articles.tag_id')
+        //                  ->where('category','like',"$search%")
+        //                  ->orwhere('tag','like',"$search%")->get();
+        $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
+            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
+            ->join('tags', 'tags.id', '=', 'article_tag.tag_id')
+            ->where('category', 'like', "$search%")
+            ->orWhere('tag', 'like', "$search%")
+            ->get();
 
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
         }
-        if( $article){
-            return $this->apiResponse($article,'Article with this categorie found',200);
+        if ($article) {
+            return $this->apiResponse($article, 'Article(s) with this category or tag :', 200);
         }
+
+        // $article=Article::with('categorie')->where('category','like','%$search%')->get();
 
     }
 }

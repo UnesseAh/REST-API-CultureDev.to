@@ -21,10 +21,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ->forgetCachedPermissions();
 
         // Create permissions for users
-        Permission::create(['name' => 'show user']);
-        Permission::create(['name' => 'add user']);
-        Permission::create(['name' => 'edit user']);
-        Permission::create(['name' => 'delete user']);
+//        Permission::create(['name' => 'show user']);
+//        Permission::create(['name' => 'add user']);
+//        Permission::create(['name' => 'edit user']);
+//        Permission::create(['name' => 'delete user']);
 
         // Create permissions for articles
         Permission::create(['name' => 'add article']);
@@ -52,6 +52,12 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'edit every comment']);
         Permission::create(['name' => 'delete my comment']);
         Permission::create(['name' => 'delete every comment']);
+
+        // Create permissions for roles
+        Permission::create(['name' => 'show role']);
+        Permission::create(['name' => 'add role']);
+        Permission::create(['name' => 'edit role']);
+        Permission::create(['name' => 'delete role']);
 
 
         // create role admin and assign permissions (3)

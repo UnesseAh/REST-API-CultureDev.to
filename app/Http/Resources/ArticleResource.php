@@ -15,15 +15,14 @@ class ArticleResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        $commentNames = $this->comments->map(function ($comment) {
+            return $comment->comment;
+        });
+        $tagNames = $this->tags->map(function ($tag) {
+            return $tag->tag;
+        });
+
         return [
-
-            // 'title'=>$this->title,
-            // 'description'=>$this->description,
-            // 'content'=>$this->content,
-            // 'category'=>$this->categorie,
-
-            // 'category_id'=>$this->category_id,
 
             'id' => $this->id,
             'title' => $this->title,
@@ -31,14 +30,12 @@ class ArticleResource extends JsonResource
             'description' => $this->description,
             'category' => new CategoryResource($this->category),
             'user' => new UserResource($this->user),
-            'comments' => new CommentCollection($this->comments)
+            'comments' => new CommentCollection($this->comments),
+            'tags' => new TagCollection($this->tags)
 
 
 
-            // 'category'=>$this->categorie->category ?? null,
-            // 'tag'=>$this->tags->tag,
-            // 'comment'=>$this->comments->comment,
-            // 'user'=>$this->user->name
+            
 
         ];
     }
