@@ -17,31 +17,21 @@ class Article extends Model
         'user_id',
     ];
 
-    // public function categorie()
-    // {
-    //     return $this->belongsTo(Category::class);
-    // }
 
 
-    // public function tags(){
-    //     return $this->belongsToMany(Tag::class);
-    // }
-    // public function user(){
-    //     return $this->hasOne(User::class);
-    // }
-
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
-
-    public function category()
-    {
+    public function category(){
         return $this->belongsTo(Category::class);
     }
 
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class);
+    public function tags(){
+        return $this->belongsToMany(Tag::class, 'article_tags');
     }
 
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

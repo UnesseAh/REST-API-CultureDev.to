@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCommentRequest;
+use App\Http\Resources\CommentResource;
+use App\Http\Resources\CommentCollection;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 
@@ -21,12 +23,16 @@ class CommentController extends Controller
      */
     public function index()
     {
-        $Comments = Comment::orderBy('id')->get();
+        // $Comments = Comment::orderBy('id')->get();
 
-        return response()->json([
-            'status' => 'success',
-            'Comments' => $Comments
-        ]);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'Comments' => $Comments
+        // ]);
+
+        $comments = Comment::all();
+
+        return new CommentCollection($comments);
     }
 
     /**

@@ -23,23 +23,19 @@ class ArticleResource extends JsonResource
         });
 
         return [
-            'title'=>$this->title,
-            'description'=>$this->description,
+
+            'id' => $this->id,
+            'title' => $this->title,
             'content'=>$this->content,
-            'category'=>$this->category->category ?? null,
-            'tag'=>$tagNames,
-            'comment' => $commentNames,
-            // 'comment' =>$this->comments->comment,
-            'category_id'=>$this->category_id,
-           
-            
+            'description' => $this->description,
+            'category' => new CategoryResource($this->category),
+            'user' => new UserResource($this->user),
+            'comments' => new CommentCollection($this->comments),
+            'tags' => new TagCollection($this->tags)
 
 
+
             
-            // 'category'=>$this->categorie->category ?? null,
-            // 'tag'=>$this->tags->tag,
-            // 'comment'=>$this->comments->comment,
-            // 'user'=>$this->user->name
 
         ];
     }

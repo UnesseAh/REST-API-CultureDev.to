@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
-
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateArticleRequest;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Resources\ArticleResource;
+use App\Http\Resources\ArticleCollection;
+use App\Models\Article;
+
+
 
 class ArticleController extends Controller
 {
@@ -18,17 +20,19 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // public function index()
-    // {
-    //     // $articles = ArticleResource::collection(Article::all());
-    //     $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
-    //     return $this->apiResponse($articles, 'ok', 200);
-    // }
+ 
 
     public function index()
     {
-        $articles = ArticleResource::collection(Article::with('category', 'tags', 'comments')->get());
-        return $this->apiResponse($articles, 'ok', 200);
+        // $articles = ArticleResource::collection(Article::get());
+        // // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
+        // return $this->apiResponse($articles, 'ok', 200);
+
+       // toufik work
+        $articles = Article::all();
+
+        return new ArticleCollection($articles);
+
     }
 
 
@@ -56,7 +60,7 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
+            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
@@ -79,14 +83,20 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Article $article)
     {
         // $article = Article::findorfail($id);
-        $article = Article::with('category', 'tags', 'comments')->find($id);
-        if ($article) {
-            return $this->apiResponse($article, 'ok', 200);
+        // if ($article) {
+        //     return $this->apiResponse($article, 'ok', 200);
+        // }
+        // return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+
+
+        // // toufik work
+        if (!$article) {
+            return response()->json(['message' => 'Article not found'], 404);
         }
-        return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+        return new ArticleResource($article);
     }
 
     /**
@@ -129,10 +139,13 @@ class ArticleController extends Controller
             return $this->apiResponse(null, $validator->errors(), 400);
         }
 
-        $article->update($request->all());
-        $article->refresh();
+        $article = Article::findorfail($id);
 
-        return $this->apiResponse($article, 'Article updated', 200);
+        $article->update($request->all());
+        if($article){
+            return $this->apiResponse($article,'Article updated',201);
+        }
+
     }
 
 
