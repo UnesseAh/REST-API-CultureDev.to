@@ -12,6 +12,7 @@ class AuthController extends Controller
 {
     //
     public function register(Request $request){
+
         $credentials = $request->validate([
             'name'=>'required|string|min:3',
             'email'=>'required|string|email|unique:users',
@@ -46,16 +47,22 @@ class AuthController extends Controller
         if(!Auth::attempt($credentials)){
             return response('invalid login', Response::HTTP_UNAUTHORIZED);
         }
+        //return response(['user'=>Auth::user()],200);
 
-        return response(['user'=>Auth::user()],200);
+        $token = Auth::user()->createToken('auth-token')->plainTextToken;
+        return response()->json([
+            'user' => Auth::user(),
+            'token' => $token,
+        ], 200);
+
     }
 
     public function logout(Request $request){
-        
+
         auth()->user()->tokens()->delete();
 
         return 'logged out';
-        
+
     }
 
 

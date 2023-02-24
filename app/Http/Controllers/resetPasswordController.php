@@ -12,15 +12,15 @@ class resetPasswordController extends Controller
 {
     //
     function sendResetToken(Request $request){
-        
+
             $request->validate(['email' => 'required|email']);
-         
+
             $status = Password::sendResetLink(
                 $request->only('email')
             );
-         
+
             return $status === Password::RESET_LINK_SENT ? response()->json(['message'=>'success']) : response()->json(['message'=>'error']) ;
-             
+
         }
 
     function resetPassword(Request $request){
@@ -29,22 +29,22 @@ class resetPasswordController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-     
+
         $status = Password::reset(
             $request->only('email', 'password', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
                 ])->setRememberToken(Str::random(60));
-     
+
                 $user->save();
             }
         );
-     
-        return $status === Password::PASSWORD_RESET 
-                            ?response()->json(['message'=>'successful reset']) 
+
+        return $status === Password::PASSWORD_RESET
+                            ?response()->json(['message'=>'successful reset'])
                             : response()->json(['message'=>'something went wrong']);
     }
 
-    
+
 }

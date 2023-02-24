@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateArticleRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Resources\ArticleResource;
@@ -21,7 +22,7 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
- 
+
 
     public function index()
     {
@@ -93,7 +94,7 @@ class ArticleController extends Controller
         return $this->apiResponse(data: null, message: 'the article not found', status: 404);
 
 
-       
+
     }
 
     /**
@@ -114,28 +115,33 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-   
+
 
     public function update(Request $request, $id)
     {
+        $user = Auth::user();
         $article = Article::find($id);
+        if(!$user->can('edit every article') && $user->id != $article->user_id){
+            return $this->apiResponse(null, 'you dont have permission to edit this article', 400);
+        }
+
         if (!$article) {
             return $this->apiResponse(null, 'Article not found', 404);
         }
+
 
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
             return $this->apiResponse(null, $validator->errors(), 400);
         }
 
-        
+
 
         $article->update($request->all());
         // $article->tags()->updateExistingPivot($request->id);
@@ -143,6 +149,7 @@ class ArticleController extends Controller
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
+
 
     }
 
@@ -162,7 +169,7 @@ class ArticleController extends Controller
 
         // Remove references to the article being deleted from the "article_tags" table
         // DB::table('article_tags')->where('article_id', $id)->delete();
-        
+
         // $article->tags()->detach([$request->tag_id]);
         $article->delete();
 
@@ -178,7 +185,7 @@ class ArticleController extends Controller
         //                  ->join('tags', 'tags.id', '=', 'articles.tag_id')
         //                  ->where('category','like',"$search%")
         //                  ->orwhere('tag','like',"$search%")->get();
-       
+
             $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
             ->join('article_tags', 'articles.id', '=', 'article_tags.article_id')
             ->join('tags', 'tags.id', '=', 'article_tags.tag_id')
