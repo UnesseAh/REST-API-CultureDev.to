@@ -18,15 +18,19 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // public function index()
+    // {
+    //     // $articles = ArticleResource::collection(Article::all());
+    //     $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
+    //     return $this->apiResponse($articles, 'ok', 200);
+    // }
+
     public function index()
     {
-        $articles = ArticleResource::collection(Article::get());
-        // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
+        $articles = ArticleResource::collection(Article::with('category', 'tags', 'comments')->get());
         return $this->apiResponse($articles, 'ok', 200);
-       
-
-
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -47,7 +51,7 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
 
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
@@ -57,7 +61,7 @@ class ArticleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->apiResponse(null, $validator->errors(), status: 400);
+            return $this->apiResponse(null, $validator->errors(), 400);
         }
 
         $article = Article::create($request->all());
@@ -77,7 +81,8 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = Article::findorfail($id);
+        // $article = Article::findorfail($id);
+        $article = Article::with('category', 'tags', 'comments')->find($id);
         if ($article) {
             return $this->apiResponse($article, 'ok', 200);
         }
@@ -102,9 +107,16 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
+   
+
     public function update(Request $request, $id)
     {
-         $validator = Validator::make($request->all(),[
+        $article = Article::find($id);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
+        }
+
+        $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
@@ -114,20 +126,15 @@ class ArticleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->apiResponse(null, $validator->errors(),  400);
+            return $this->apiResponse(null, $validator->errors(), 400);
         }
-        
-        $article = Article::findorfail($id);
 
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
-        }
         $article->update($request->all());
-        if($article){
-            return $this->apiResponse($article,'Article updated',201);
-        }
-        
+        $article->refresh();
+
+        return $this->apiResponse($article, 'Article updated', 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -138,25 +145,37 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         $article = Article::findorfail($id);
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
         }
         $article->delete($id);
-        if($article){
-            return $this->apiResponse(null,'Article deleted',200);
+        if ($article) {
+            return $this->apiResponse(null, 'Article deleted', 200);
         }
     }
 
-    public function search($search){
-        // $article=Article::with('categorie')->where('category','like','%$search%')->get();
-        $article=Article::where('title','like',"$search%")->get();
+    public function search($search)
+    {
+        // $article=Article::with('categorie')->where('category','like','$search%')->get();
+        // $article=Article::join('categories', 'categories.id', '=', 'articles.category_id')
+        //                  ->join('tags', 'tags.id', '=', 'articles.tag_id')
+        //                  ->where('category','like',"$search%")
+        //                  ->orwhere('tag','like',"$search%")->get();
+        $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
+            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
+            ->join('tags', 'tags.id', '=', 'article_tag.tag_id')
+            ->where('category', 'like', "$search%")
+            ->orWhere('tag', 'like', "$search%")
+            ->get();
 
-        if(!$article){
-            return $this->apiResponse(null,'Article not found',404);
+        if (!$article) {
+            return $this->apiResponse(null, 'Article not found', 404);
         }
-        if( $article){
-            return $this->apiResponse($article,'Article with this categorie found',200);
+        if ($article) {
+            return $this->apiResponse($article, 'Article(s) with this category or tag :', 200);
         }
+
+        // $article=Article::with('categorie')->where('category','like','%$search%')->get();
 
     }
 }

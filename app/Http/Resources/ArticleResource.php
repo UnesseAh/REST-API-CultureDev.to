@@ -15,15 +15,24 @@ class ArticleResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        $commentNames = $this->comments->map(function ($comment) {
+            return $comment->comment;
+        });
+        $tagNames = $this->tags->map(function ($tag) {
+            return $tag->tag;
+        });
+
         return [
-           
             'title'=>$this->title,
             'description'=>$this->description,
             'content'=>$this->content,
-            'category'=>$this->categorie,
-
+            'category'=>$this->category->category ?? null,
+            'tag'=>$tagNames,
+            'comment' => $commentNames,
+            // 'comment' =>$this->comments->comment,
             'category_id'=>$this->category_id,
+           
+            
 
 
             
