@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\resetPasswordController;
 use App\Http\Controllers\TagController;
 
 /*
@@ -23,37 +24,39 @@ use App\Http\Controllers\TagController;
 
 //users
 
-Route::get('/user', [AuthController::class,'user'])->middleware('auth:sanctum');
 
 Route::post('/user/{user}',[ProfileController::class,'editProfile']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('forgot-password', [resetPasswordController::class,'sendResetToken'])->middleware('guest')->name('password.email');
+Route::post('reset-password', [resetPasswordController::class,'resetPassword'])->middleware('guest')->name('password.update');
+Route::get('reset-password/{token}', function (string $token) {
+    return $token;
+})->middleware('guest')->name('password.reset');
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 
 
 Route::group(['middleware'=>'auth:sanctum'], function(){
     Route::post('logout',[AuthController::class,'logout']);
     Route::get('profile',[AuthController::class,'profile']);
+    Route::get('/articles',[ArticleController::class,'index']);
+    Route::get('/articles/{id}',[ArticleController::class,'show']);
+    Route::post('/articles',[ArticleController::class,'store']);
+    Route::post('/articles/{id}',[ArticleController::class,'update']);
+    Route::post('/articles/{id}',[ArticleController::class,'destroy']);
+    Route::get('/articles/search/{search}',[ArticleController::class,'search']);
+    Route::get('categories', [CategoryController::class, 'index']);
 
 });
+
+// Route::group(['middleware'=>'permission:vie article'], function(){
 
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 
 
 //Articles
-Route::get('/articles',[ArticleController::class,'index']);
-Route::get('/articles/{id}',[ArticleController::class,'show']);
-Route::post('/articles',[ArticleController::class,'store']);
-Route::post('/articles/{id}',[ArticleController::class,'update']);
-Route::post('/articles/{id}',[ArticleController::class,'destroy']);
-Route::get('/articles/search/{search}',[ArticleController::class,'search']);
+;
 
 
 
@@ -63,7 +66,7 @@ Route::get('/articles/search/{search}',[ArticleController::class,'search']);
 Route::apiResource('comments', CommentController::class);
 
 // Categories
-Route::get('categories', [CategoryController::class, 'index']);
+// Route::get('categories', [CategoryController::class, 'index'])
 Route::post('categories', [CategoryController::class, 'store']);
 Route::get('category/{category}', [CategoryController::class, 'show']);
 Route::put('category/{category}', [CategoryController::class, 'update']);
