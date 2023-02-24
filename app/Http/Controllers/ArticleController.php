@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateArticleRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 use App\Http\Resources\ArticleResource;
@@ -55,6 +56,7 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
@@ -68,7 +70,7 @@ class ArticleController extends Controller
         }
 
         $article = Article::create($request->all());
-
+        $article->tags()->attach($request->tag_id);
         if ($article) {
             return $this->apiResponse($article, "Article Saved successfully", 201);
         } else {
@@ -84,6 +86,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article,$id)
     {
+
         $article = Article::find($id);
         if ($article) {
              return new ArticleResource($article);
@@ -116,21 +119,22 @@ class ArticleController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $user = Auth::user();
-//        if(!$user->can('edit every article') && $user->id != $article->user_id){
-//            return $this->apiResponse(null, 'you dont have permission to edit this article', 400);
-//        }
-         $article = Article::find($id);
+        $user = Auth::user();
+        $article = Article::find($id);
+        if(!$user->can('edit every article') && $user->id != $article->user_id){
+            return $this->apiResponse(null, 'you dont have permission to edit this article', 400);
+        }
+
         if (!$article) {
             return $this->apiResponse(null, 'Article not found', 404);
         }
+
 
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -140,9 +144,12 @@ class ArticleController extends Controller
 
 
         $article->update($request->all());
+        // $article->tags()->updateExistingPivot($request->id);
+        $article->tags()->sync([$request->tag_id]);
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
+
 
     }
 
@@ -153,7 +160,7 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         $article = Article::find($id);
         if (!$article) {
@@ -161,9 +168,11 @@ class ArticleController extends Controller
         }
 
         // Remove references to the article being deleted from the "article_tags" table
-        DB::table('article_tags')->where('article_id', $id)->delete();
+        // DB::table('article_tags')->where('article_id', $id)->delete();
 
+        // $article->tags()->detach([$request->tag_id]);
         $article->delete();
+
         if ($article) {
             return $this->apiResponse(null, 'Article deleted', 200);
         }
@@ -176,9 +185,10 @@ class ArticleController extends Controller
         //                  ->join('tags', 'tags.id', '=', 'articles.tag_id')
         //                  ->where('category','like',"$search%")
         //                  ->orwhere('tag','like',"$search%")->get();
-        $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
-            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
-            ->join('tags', 'tags.id', '=', 'article_tag.tag_id')
+
+            $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
+            ->join('article_tags', 'articles.id', '=', 'article_tags.article_id')
+            ->join('tags', 'tags.id', '=', 'article_tags.tag_id')
             ->where('category', 'like', "$search%")
             ->orWhere('tag', 'like', "$search%")
             ->get();

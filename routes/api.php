@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\resetPasswordController;
 use App\Http\Controllers\TagController;
 
 /*
@@ -26,13 +27,22 @@ Route::post('/user/{user}',[ProfileController::class,'editProfile']);
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 
+Route::post('forgot-password', [resetPasswordController::class,'sendResetToken'])->middleware('guest')->name('password.email');
+Route::post('reset-password', [resetPasswordController::class,'resetPassword'])->middleware('guest')->name('password.update');
+Route::get('reset-password/{token}', function (string $token) {
+    return $token;
+})->middleware('guest')->name('password.reset');
+
+
+
+
 Route::group(['middleware'=>'auth:sanctum'], function(){
     Route::post('logout',[AuthController::class,'logout']);
     Route::get('profile',[AuthController::class,'profile']);
     //Articles
     Route::group(['controller' => ArticleController::class], function (){
         Route::post('/articles','store')->middleware('permission:add article');
-        Route::post('/articles/{id}','update')->middleware('permission:edit my article | edit every article');
+        Route::put('articles/{id}','update')->middleware('permission:edit my article|edit every article');
         Route::post('/articles/{id}','destroy')->middleware('delete article');
     });
     // Categories
@@ -56,8 +66,8 @@ Route::group(['middleware'=>'auth:sanctum'], function(){
         Route::get('comments','index')->middleware('permission:show comment');
         Route::post('comments','store')->middleware('permission:add comment');
         Route::get('comments/{comment}','show')->middleware('permission:show comment');
-        Route::put('comments/{comment}','update')->middleware('permission:edit my comment | edit every comment');
-        Route::delete('comments/{comment}','destroy')->middleware('permission:delete my comment | delete every comment');
+        Route::put('comments/{comment}','update')->middleware('permission:edit my comment|edit every comment');
+        Route::delete('comments/{comment}','destroy')->middleware('permission:delete my comment|delete every comment');
     });
     // Roles
     Route::group(['controller' => RoleController::class], function (){
@@ -74,7 +84,6 @@ Route::group(['middleware'=>'auth:sanctum'], function(){
 Route::group(['controller' => ArticleController::class], function (){
     Route::get('/articles','index');
     Route::get('/articles/{id}','show');
-
 });
 
 
