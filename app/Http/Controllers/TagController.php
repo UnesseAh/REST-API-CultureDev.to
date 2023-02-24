@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\TagResource;
+use App\Http\Resources\TagCollection;
 use App\Models\Tag;
 
 class TagController extends Controller
@@ -14,8 +16,12 @@ class TagController extends Controller
      */
     public function index()
     {
-        $tags = Tag::all();
-        return response()->json($tags);
+        // $tags = Tag::all();
+        // return response()->json($tags);
+
+         $tags = Tag::all();
+
+        return new TagCollection($tags);
     }
 
     /**

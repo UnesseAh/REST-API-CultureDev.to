@@ -13,7 +13,7 @@ class Article extends Model
         'description',
         'content',
         'category_id',
-        'tag_id',
+        // 'tag_id',
         'user_id',
     ];
 
@@ -42,7 +42,7 @@ class Article extends Model
     }
 
     public function tags(){
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'article_tags');
     }
 
     public function user(){

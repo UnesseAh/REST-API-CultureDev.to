@@ -31,7 +31,8 @@ class ArticleResource extends JsonResource
             'description' => $this->description,
             'category' => new CategoryResource($this->category),
             'user' => new UserResource($this->user),
-            'comments' => new CommentCollection($this->comments)
+            'comments' => new CommentCollection($this->comments),
+            'tags' => new TagCollection($this->tags)
 
 
 
