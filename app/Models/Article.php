@@ -13,24 +13,10 @@ class Article extends Model
         'description',
         'content',
         'category_id',
-        'tag_id',
+        // 'tag_id',
         'user_id',
     ];
 
-    // public function categorie()
-    // {
-    //     return $this->belongsTo(Category::class);
-    // }
-    // public function tags(){
-    //     return $this->belongsToMany(Tag::class);
-    // }
-    // public function user(){
-    //     return $this->hasOne(User::class);
-    // }
-
-    // public function comments(){
-    //     return $this->hasMany(Comment::class);
-    // }
 
 
     public function comments()
@@ -42,7 +28,7 @@ class Article extends Model
     }
 
     public function tags(){
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'article_tags');
     }
 
     public function user(){

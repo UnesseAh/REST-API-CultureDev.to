@@ -56,7 +56,12 @@ Route::post('login',[AuthController::class,'login']);
 
 
 //Articles
-;
+Route::get('/articles',[ArticleController::class,'index']);
+Route::get('/articles/{id}',[ArticleController::class,'show']);
+Route::post('/articles',[ArticleController::class,'store']);
+Route::put('/articles/{id}',[ArticleController::class,'update']);
+Route::delete('/articles/{id}',[ArticleController::class,'destroy']);
+Route::get('/articles/search/{search}',[ArticleController::class,'search']);
 
 
 
