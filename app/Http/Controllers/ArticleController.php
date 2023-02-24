@@ -85,7 +85,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article,$id)
     {
-        
+
         $article = Article::find($id);
         if ($article) {
              return new ArticleResource($article);
@@ -174,9 +174,10 @@ class ArticleController extends Controller
         //                  ->join('tags', 'tags.id', '=', 'articles.tag_id')
         //                  ->where('category','like',"$search%")
         //                  ->orwhere('tag','like',"$search%")->get();
-        $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
-            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
-            ->join('tags', 'tags.id', '=', 'article_tag.tag_id')
+       
+            $article = Article::join('categories', 'categories.id', '=', 'articles.category_id')
+            ->join('article_tags', 'articles.id', '=', 'article_tags.article_id')
+            ->join('tags', 'tags.id', '=', 'article_tags.tag_id')
             ->where('category', 'like', "$search%")
             ->orWhere('tag', 'like', "$search%")
             ->get();
