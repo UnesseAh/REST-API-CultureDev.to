@@ -23,7 +23,7 @@ class ArticleController extends Controller
         $articles = ArticleResource::collection(Article::get());
         // $articles = Article::join('categories','categories.id','=','articles.category_id')->get();
         return $this->apiResponse($articles, 'ok', 200);
-       
+
 
 
     }
@@ -46,7 +46,6 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(),[
             'title' => 'required|max:255',
             'description' => 'required',
@@ -104,6 +103,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
+
          $validator = Validator::make($request->all(),[
             'title' => 'required|max:255',
             'description' => 'required',
@@ -116,7 +116,7 @@ class ArticleController extends Controller
         if ($validator->fails()) {
             return $this->apiResponse(null, $validator->errors(),  400);
         }
-        
+
         $article = Article::findorfail($id);
 
         if(!$article){
@@ -126,7 +126,6 @@ class ArticleController extends Controller
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
-        
     }
 
     /**
