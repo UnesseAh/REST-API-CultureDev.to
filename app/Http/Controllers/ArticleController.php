@@ -57,7 +57,7 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'tag_id' => 'required',
+            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
