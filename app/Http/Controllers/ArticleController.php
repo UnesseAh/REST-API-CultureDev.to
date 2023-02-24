@@ -69,7 +69,7 @@ class ArticleController extends Controller
         }
 
         $article = Article::create($request->all());
-
+        $article->tags()->attach($request->tag_id);
         if ($article) {
             return $this->apiResponse($article, "Article Saved successfully", 201);
         } else {
@@ -138,6 +138,8 @@ class ArticleController extends Controller
         
 
         $article->update($request->all());
+        // $article->tags()->updateExistingPivot($request->id);
+        $article->tags()->sync([$request->tag_id]);
         if($article){
             return $this->apiResponse($article,'Article updated',201);
         }
@@ -151,7 +153,7 @@ class ArticleController extends Controller
      * @param  \App\Models\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         $article = Article::find($id);
         if (!$article) {
@@ -159,9 +161,11 @@ class ArticleController extends Controller
         }
 
         // Remove references to the article being deleted from the "article_tags" table
-        DB::table('article_tags')->where('article_id', $id)->delete();
-
+        // DB::table('article_tags')->where('article_id', $id)->delete();
+        
+        // $article->tags()->detach([$request->tag_id]);
         $article->delete();
+
         if ($article) {
             return $this->apiResponse(null, 'Article deleted', 200);
         }
