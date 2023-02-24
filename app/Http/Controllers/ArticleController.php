@@ -85,18 +85,15 @@ class ArticleController extends Controller
      */
     public function show(Article $article,$id)
     {
-        $article = Article::findorfail($id);
-        // if ($article) {
-        //     return $this->apiResponse($article, 'ok', 200);
-        // }
-        // return $this->apiResponse(data: null, message: 'the article not found', status: 404);
-
-
-        // // toufik work
-        if (!$article) {
-            // return response()->json(['message' => 'Article not found'], 404);
+        
+        $article = Article::find($id);
+        if ($article) {
+             return new ArticleResource($article);
         }
-        return new ArticleResource($article);
+        return $this->apiResponse(data: null, message: 'the article not found', status: 404);
+
+
+       
     }
 
     /**
@@ -138,7 +135,7 @@ class ArticleController extends Controller
             return $this->apiResponse(null, $validator->errors(), 400);
         }
 
-        // $article = Article::findorfail($id);
+        
 
         $article->update($request->all());
         if($article){
@@ -156,10 +153,11 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        $article = Article::findorfail($id);
+        $article = Article::find($id);
         if (!$article) {
             return $this->apiResponse(null, 'Article not found', 404);
         }
+
         // Remove references to the article being deleted from the "article_tags" table
         DB::table('article_tags')->where('article_id', $id)->delete();
 
