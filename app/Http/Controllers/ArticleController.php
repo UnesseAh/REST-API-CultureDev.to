@@ -61,7 +61,6 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
@@ -95,7 +94,7 @@ class ArticleController extends Controller
 
         // // toufik work
         if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
+            // return response()->json(['message' => 'Article not found'], 404);
         }
         return new ArticleResource($article);
     }
@@ -132,7 +131,6 @@ class ArticleController extends Controller
             'description' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            // 'tag_id' => 'required',
             'user_id' => 'required',
         ]);
 
@@ -164,7 +162,7 @@ class ArticleController extends Controller
         }
         // Remove references to the article being deleted from the "article_tags" table
         DB::table('article_tags')->where('article_id', $id)->delete();
-        
+
         $article->delete();
         if ($article) {
             return $this->apiResponse(null, 'Article deleted', 200);
