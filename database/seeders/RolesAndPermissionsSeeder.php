@@ -63,6 +63,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'add article',
                 'edit my article',
                 'delete my article',
+                'show comment',
                 'add comment',
                 'edit my comment',
                 'delete my comment'

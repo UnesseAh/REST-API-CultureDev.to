@@ -16,7 +16,8 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return response()->json(['cats'=>$categories,'user'=>Auth::user()]);
+        //return response()->json(['cats'=>$categories,'user'=>Auth::user()]);
+        return response()->json(['cats'=>$categories]);
     }
 
     /**

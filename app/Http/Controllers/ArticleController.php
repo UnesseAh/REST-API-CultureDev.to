@@ -162,7 +162,13 @@ class ArticleController extends Controller
      */
     public function destroy($id,Request $request)
     {
+        $user = Auth::user();
         $article = Article::find($id);
+        if(!$user->can('delete every article') && $user->id != $article->user_id){
+            return $this->apiResponse(null, 'you dont have permission to delete this article', 400);
+        }
+
+        //$article = Article::find($id);
         if (!$article) {
             return $this->apiResponse(null, 'Article not found', 404);
         }

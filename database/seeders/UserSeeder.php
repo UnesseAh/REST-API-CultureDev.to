@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
                     $user->assignRole('admin');
                 }
             );
-        User::factory()->count(1)
+        User::factory()->count(2)
             ->create()
             ->each(
                 function ($user) {

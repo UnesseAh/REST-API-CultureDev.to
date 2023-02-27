@@ -43,7 +43,7 @@ Route::group(['middleware'=>'auth:sanctum'], function(){
     Route::group(['controller' => ArticleController::class], function (){
         Route::post('/articles','store')->middleware('permission:add article');
         Route::put('articles/{id}','update')->middleware('permission:edit my article|edit every article');
-        Route::post('/articles/{id}','destroy')->middleware('delete article');
+        Route::delete('/articles/{id}','destroy');
     });
     // Categories
     Route::group(['controller' => CategoryController::class], function (){
